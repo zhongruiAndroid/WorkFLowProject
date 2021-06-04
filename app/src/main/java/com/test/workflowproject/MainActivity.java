@@ -12,8 +12,15 @@ import com.github.zr.WorkCallback;
 import com.github.zr.WorkFlow;
 import com.github.zr.WorkListener;
 import com.github.zr.WorkNotify;
+import com.test.workflowproject.test.Func;
+import com.test.workflowproject.test.MyObservable;
+import com.test.workflowproject.test.Observable;
+import com.test.workflowproject.test.Observer;
 
 import org.json.JSONArray;
+
+import rx.Subscriber;
+import rx.functions.Func1;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -115,9 +122,76 @@ public class MainActivity extends AppCompatActivity {
         btTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MyObservable.create(new Observable<String>() {
+                    @Override
+                    public void subscribe(Observer observer) {
+                        observer.onNext("1");
+                        observer.onNext("2");
+                        observer.onComplete();
+                        observer.onError();
+                    }
+                }).map(new Func<String,Integer>() {
+                    @Override
+                    public Integer call(String o) {
+                        return "1".equals(o)?10:-9;
+                    }
+                }).filter(new Func<Integer,Boolean>() {
+                    @Override
+                    public Boolean call(Integer o) {
+                        return true;
+                    }
+                }).subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onNext(Integer s) {
+                        Log.i("====", "====onNext:" + s);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.i("====", "====onComplete:");
+                    }
+
+                    @Override
+                    public void onError() {
+                        Log.i("====", "====onError:");
+                    }
+                });
             }
         });
     }
 
+    public void test() {
+        rx.Observable.create(new rx.Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+
+            }
+        }).map(new Func1<String, Integer>() {
+            @Override
+            public Integer call(String s) {
+                return null;
+            }
+        }).filter(new Func1<Integer, Boolean>() {
+            @Override
+            public Boolean call(Integer integer) {
+                return null;
+            }
+        }).subscribe(new Subscriber<Integer>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+
+            }
+        });
+    }
 
 }
