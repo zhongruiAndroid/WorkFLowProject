@@ -3,7 +3,9 @@ package com.github.zr;
 import android.os.Looper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,6 +14,7 @@ public class Flow {
     private AtomicInteger atomicInteger = new AtomicInteger();
     private AtomicInteger errorInteger = new AtomicInteger();
     private List<WorkListener> workListenerList = new ArrayList<>();
+    private Map<Integer,Object> dataMap = new HashMap<>();
 
     private AtomicBoolean rightAwayNotifyError;
 
@@ -41,35 +44,22 @@ public class Flow {
         if (workListenerList == null) {
             return;
         }
-        for (WorkListener item : workListenerList) {
+        for (int i = 0; i < workListenerList.size(); i++) {
+            WorkListener item=workListenerList.get(i);
             if (item == null) {
                 continue;
             }
+            final int finalI = i;
             item.doWork(new WorkNotify() {
                 @Override
                 public void onPass() {
-                    if(rightAwayNotifyError.get()){
-                        return;
-                    }
-                    int andGet = atomicInteger.addAndGet(1);
-                    if (count == andGet) {
-                        if (callback != null) {
-                            if (Looper.myLooper() == Looper.getMainLooper()) {
-                                callback.onSuccess();
-                            } else {
-                                WorkFlow.getHandler().post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.onSuccess();
-                                    }
-                                });
-                            }
-                        }
-                    } else if (andGet + errorInteger.get() >= count) {
-                        errorNotify(callback);
-                    }
+                    dealPass(callback);
                 }
-
+                @Override
+                public void onPass(Object obj) {
+                    dataMap.put(finalI,obj);
+                    dealPass(callback);
+                }
                 @Override
                 public void onError() {
                     if (rightAwayNotifyError.get()) {
@@ -82,6 +72,29 @@ public class Flow {
                     }
                 }
             });
+        }
+    }
+
+    private void dealPass(final WorkCallback callback) {
+        if (rightAwayNotifyError.get()) {
+            return;
+        }
+        int andGet = atomicInteger.addAndGet(1);
+        if (count == andGet) {
+            if (callback != null) {
+                if (Looper.myLooper() == Looper.getMainLooper()) {
+                    callback.onSuccess(dataMap);
+                } else {
+                    WorkFlow.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSuccess(dataMap);
+                        }
+                    });
+                }
+            }
+        } else if (andGet + errorInteger.get() >= count) {
+            errorNotify(callback);
         }
     }
 

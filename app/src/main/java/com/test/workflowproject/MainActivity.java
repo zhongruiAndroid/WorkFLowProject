@@ -19,6 +19,8 @@ import com.test.workflowproject.test.Observer;
 
 import org.json.JSONArray;
 
+import java.util.Map;
+
 import rx.Subscriber;
 import rx.functions.Func1;
 
@@ -108,10 +110,9 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .start(new WorkCallback() {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(Map<Integer, Object> map) {
                         Log.i("=====", "===onSuccess==");
                     }
-
                     @Override
                     public void onError() {
                         Log.i("=====", "===onError==");
