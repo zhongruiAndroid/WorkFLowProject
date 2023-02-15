@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,7 +15,7 @@ public class Flow {
     private AtomicInteger atomicInteger = new AtomicInteger();
     private AtomicInteger errorInteger = new AtomicInteger();
     private List<WorkListener> workListenerList = new ArrayList<>();
-    private Map<String,Object> dataMap = new HashMap<>();
+    private Map<String,Object> dataMap = new ConcurrentHashMap<>();
 
     private AtomicBoolean rightAwayNotifyError;
 
