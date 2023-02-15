@@ -19,9 +19,13 @@ public class Test {
             public void doWork(WorkNotify notify) {
                 notify.onError();
             }
+        }).addWork(new WorkListener() {
+            @Override
+            public void doWork(WorkNotify notify) {
+            }
         }).start(new WorkCallback() {
             @Override
-            public void onSuccess(Map<Integer, Object> map) {
+            public void onSuccess(Map<String, Object> map) {
                 map.get(1);
             }
             @Override

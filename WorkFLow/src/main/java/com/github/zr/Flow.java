@@ -14,7 +14,7 @@ public class Flow {
     private AtomicInteger atomicInteger = new AtomicInteger();
     private AtomicInteger errorInteger = new AtomicInteger();
     private List<WorkListener> workListenerList = new ArrayList<>();
-    private Map<Integer,Object> dataMap = new HashMap<>();
+    private Map<String,Object> dataMap = new HashMap<>();
 
     private AtomicBoolean rightAwayNotifyError;
 
@@ -25,7 +25,13 @@ public class Flow {
     public Flow(boolean rightAwayNotifyError) {
         this.rightAwayNotifyError = new AtomicBoolean(rightAwayNotifyError);
     }
-
+    public void reset(){
+        count=0;
+        atomicInteger.set(0);
+        errorInteger.set(0);
+        workListenerList.clear();
+        dataMap.clear();
+    }
     public Flow addWork(final WorkListener workListener) {
         if (workListener == null) {
             return this;
@@ -56,8 +62,15 @@ public class Flow {
                     dealPass(callback);
                 }
                 @Override
+                public void onPass(String tag,Object obj) {
+                    if(tag!=null){
+                        dataMap.put(tag,obj);
+                    }
+                    dealPass(callback);
+                }
+                @Override
                 public void onPass(Object obj) {
-                    dataMap.put(finalI,obj);
+                    dataMap.put(finalI+"",obj);
                     dealPass(callback);
                 }
                 @Override
