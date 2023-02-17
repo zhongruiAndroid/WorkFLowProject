@@ -4,10 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.github.zr.multi.Flow;
-import com.github.zr.single.MyObservable;
+import com.github.zr.single.WorkObservable;
 import com.github.zr.single.Observable;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,7 +34,7 @@ public class WorkFlow {
         return new Flow(rightAwayNotifyError);
     }
 
-    public static <T> MyObservable<T> create(Observable<T> observable) {
-        return new MyObservable<T>(observable);
+    public static <T> WorkObservable<T> create(Observable<T> observable) {
+        return new WorkObservable<T>(observable);
     }
 }
