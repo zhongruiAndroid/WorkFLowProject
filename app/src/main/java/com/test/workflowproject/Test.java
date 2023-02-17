@@ -1,9 +1,9 @@
 package com.test.workflowproject;
 
-import com.github.zr.WorkCallback;
+import com.github.zr.multi.WorkCallback;
 import com.github.zr.WorkFlow;
-import com.github.zr.WorkListener;
-import com.github.zr.WorkNotify;
+import com.github.zr.multi.WorkListener;
+import com.github.zr.multi.WorkNotify;
 
 import java.util.Map;
 

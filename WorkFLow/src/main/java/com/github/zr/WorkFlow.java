@@ -3,15 +3,39 @@ package com.github.zr;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.github.zr.multi.Flow;
+import com.github.zr.single.MyObservable;
+import com.github.zr.single.Observable;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class WorkFlow {
-    private static Handler handler=new Handler(Looper.getMainLooper());
-    public static Handler getHandler(){
+    private static Handler handler = new Handler(Looper.getMainLooper());
+
+    public static Handler getHandler() {
         return handler;
     }
-    public static Flow get(){
+
+    public static ExecutorService executors;
+
+    public static ExecutorService getExecutors() {
+        if (executors == null) {
+            executors = Executors.newCachedThreadPool();
+        }
+        return executors;
+    }
+
+    public static Flow get() {
         return new Flow(false);
     }
-    public static Flow get(boolean rightAwayNotifyError){
+
+    public static Flow get(boolean rightAwayNotifyError) {
         return new Flow(rightAwayNotifyError);
+    }
+
+    public static <T> MyObservable<T> create(Observable<T> observable) {
+        return new MyObservable<T>(observable);
     }
 }

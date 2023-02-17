@@ -8,10 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.github.zr.WorkCallback;
+import com.github.zr.multi.WorkCallback;
 import com.github.zr.WorkFlow;
-import com.github.zr.WorkListener;
-import com.github.zr.WorkNotify;
+import com.github.zr.multi.WorkListener;
+import com.github.zr.multi.WorkNotify;
+import com.github.zr.single.filter.listener.FilterFunction;
+import com.github.zr.single.map.listener.MapFunction;
 import com.test.workflowproject.test.Func;
 import com.test.workflowproject.test.MyObservable;
 import com.test.workflowproject.test.Observable;
@@ -21,7 +23,9 @@ import org.json.JSONArray;
 
 import java.util.Map;
 
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 
 public class MainActivity extends AppCompatActivity {
@@ -110,9 +114,10 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .start(new WorkCallback() {
                     @Override
-                    public void onSuccess(Map<Integer, Object> map) {
+                    public void onSuccess(Map<String, Object> map) {
                         Log.i("=====", "===onSuccess==");
                     }
+
                     @Override
                     public void onError() {
                         Log.i("=====", "===onError==");
@@ -123,6 +128,10 @@ public class MainActivity extends AppCompatActivity {
         btTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (true) {
+                    test();
+                    return;
+                }
                 MyObservable.create(new Observable<String>() {
                     @Override
                     public void subscribe(Observer observer) {
@@ -131,12 +140,12 @@ public class MainActivity extends AppCompatActivity {
                         observer.onComplete();
                         observer.onError();
                     }
-                }).map(new Func<String,Integer>() {
+                }).map(new Func<String, Integer>() {
                     @Override
                     public Integer call(String o) {
-                        return "1".equals(o)?10:-9;
+                        return "1".equals(o) ? 10 : -9;
                     }
-                }).filter(new Func<Integer,Boolean>() {
+                }).filter(new Func<Integer, Boolean>() {
                     @Override
                     public Boolean call(Integer o) {
                         return true;
@@ -161,38 +170,82 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void test() {
+    public void test1() {
         rx.Observable.create(new rx.Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-
+                subscriber.onNext("1");
+                subscriber.onNext("2");
+                subscriber.onNext("3");
+                subscriber.onError(new Exception("test"));
+                subscriber.onCompleted();
             }
         }).map(new Func1<String, Integer>() {
             @Override
             public Integer call(String s) {
-                return null;
+                if ("2".equals(s)) {
+                    return 1 / 0;
+                }
+                return Integer.parseInt(s);
             }
-        }).filter(new Func1<Integer, Boolean>() {
-            @Override
-            public Boolean call(Integer integer) {
-                return null;
-            }
-        }).subscribe(new Subscriber<Integer>() {
+        }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Integer>() {
             @Override
             public void onCompleted() {
-
+                Log.i("=====", "===onCompleted==");
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.i("=====", "===onError==" + e.getMessage());
             }
 
             @Override
             public void onNext(Integer integer) {
-
+                Log.i("=====", "===onNext==" + integer);
             }
         });
     }
 
+    public void test() {
+        WorkFlow.create(new com.github.zr.single.Observable<String>() {
+            @Override
+            public void subscribe(com.github.zr.single.Observer<? super String> subscriber) throws Exception {
+                subscriber.onNext("1");
+                subscriber.onNext("2");
+                subscriber.onNext("3");
+                subscriber.onComplete("1");
+                subscriber.onError(-1, "onError1");
+//                subscriber.onCompleted();
+                subscriber.onError(-1, "onError2");
+                subscriber.onComplete("2");
+            }
+        }).map(new MapFunction<String, Integer>() {
+            @Override
+            public Integer call(String obj) throws Exception {
+                if("2".equals(obj)){
+//                    return 1/0;
+                }
+                return Integer.parseInt(obj);
+            }
+        }).filter(new FilterFunction<Integer>() {
+            @Override
+            public boolean call(Integer obj) throws Exception {
+                return obj==2;
+            }
+        }).subscribe(new com.github.zr.single.Observer<Integer>() {
+            @Override
+            public void onNext(Integer obj) {
+                Log.i("=====", "===onNext==" + obj);
+            }
+            @Override
+            public void onComplete(Object obj) {
+                Log.i("=====", "===onComplete==" + obj);
+            }
+            @Override
+            public void onError(int code, String msg) {
+                Log.i("=====", "===onError==" + msg);
+
+            }
+        });
+    }
 }

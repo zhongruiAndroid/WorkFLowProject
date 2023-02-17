@@ -1,4 +1,4 @@
-package com.github.zr;
+package com.github.zr.multi;
 
 public interface WorkNotify {
     void onPass();
