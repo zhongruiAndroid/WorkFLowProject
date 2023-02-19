@@ -6,6 +6,7 @@ import android.os.Looper;
 import com.github.zr.multi.Flow;
 import com.github.zr.single.WorkObservable;
 import com.github.zr.single.Observable;
+import com.github.zr.single.WorkScheduler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,5 +37,8 @@ public class WorkFlow {
 
     public static <T> WorkObservable<T> create(Observable<T> observable) {
         return new WorkObservable<T>(observable);
+    }
+    public static <T> WorkObservable<T> create(WorkScheduler scheduler,Observable<T> observable) {
+        return new WorkObservable<T>(scheduler,observable);
     }
 }
