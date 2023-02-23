@@ -10,5 +10,5 @@ public abstract class Fun3<T> implements Observer<T> {
     public void onComplete(Object obj) {
     }
     @Override
-    public abstract void onError(int code, String msg);
+    public abstract void onError(Throwable throwable, Object obj);
 }

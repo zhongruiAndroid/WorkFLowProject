@@ -11,6 +11,6 @@ public abstract class Fun1<T> implements Observer<T> {
     }
 
     @Override
-    public void onError(int code, String msg) {
+    public void onError(Throwable throwable, Object obj) {
     }
 }

@@ -214,9 +214,9 @@ public class MainActivity extends AppCompatActivity {
                 subscriber.onNext("2");
                 subscriber.onNext("3");
                 subscriber.onComplete("1");
-                subscriber.onError(-1, "onError1");
+                subscriber.onError(new Exception(), "onError1");
 //                subscriber.onCompleted();
-                subscriber.onError(-1, "onError2");
+                subscriber.onError(new Exception(), "onError2");
                 subscriber.onComplete("2");
             }
         }).map(new MapFunction<String, Integer>() {
@@ -241,11 +241,12 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(Object obj) {
                 Log.i("=====", "===onComplete==" + obj);
             }
-            @Override
-            public void onError(int code, String msg) {
-                Log.i("=====", "===onError==" + msg);
 
+            @Override
+            public void onError(Throwable throwable, Object obj) {
+                Log.i("=====", "===onError==" + throwable);
             }
+
         });
     }
 }

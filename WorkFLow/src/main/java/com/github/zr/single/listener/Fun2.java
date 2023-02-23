@@ -10,6 +10,6 @@ public abstract class Fun2<T> implements Observer<T> {
     public abstract void onComplete(Object obj);
 
     @Override
-    public void onError(int code, String msg) {
+    public void onError(Throwable throwable, Object obj) {
     }
 }

@@ -48,7 +48,7 @@ public class FilterObservable<T> extends BaseObservable {
                                 postMain(new Runnable() {
                                     @Override
                                     public void run() {
-                                        onError(0, e.getMessage());
+                                        onError(e, e.getMessage());
                                     }
                                 });
                                 return;
@@ -76,9 +76,8 @@ public class FilterObservable<T> extends BaseObservable {
                     });
                 }
             }
-
             @Override
-            public void onError(final int code, final String msg) {
+            public void onError(final Throwable throwable, final Object obj) {
                 if (done) {
                     return;
                 }
@@ -87,7 +86,7 @@ public class FilterObservable<T> extends BaseObservable {
                     postMain(new Runnable() {
                         @Override
                         public void run() {
-                            subscriber.onError(code, msg);
+                            subscriber.onError(throwable, obj);
                         }
                     });
                 }

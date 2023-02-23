@@ -6,7 +6,11 @@ import com.github.zr.multi.WorkListener;
 import com.github.zr.multi.WorkNotify;
 import com.github.zr.single.Observable;
 import com.github.zr.single.Observer;
+import com.github.zr.single.WorkScheduler;
+import com.github.zr.single.flow.listener.FlowCompleteObserver;
+import com.github.zr.single.flow.listener.FlowErrorObserver;
 import com.github.zr.single.flow.listener.FlowFunction;
+import com.github.zr.single.flow.listener.FlowNextObserver;
 import com.github.zr.single.listener.Fun1;
 
 import java.util.Map;
@@ -43,19 +47,31 @@ public class Test {
             public void subscribe(Observer<? super String> observer) throws Exception {
 
             }
-        }).flow(new FlowFunction<String, Integer>() {
+        }).flow(WorkScheduler.MAIN,new FlowFunction<String, Integer>() {
             @Override
-            public void next(String obj, Observer<Integer> observer) throws Exception {
+            public void next(String obj, FlowNextObserver<Integer> observer) throws Exception {
+                observer.next(1);
+            }
+
+            @Override
+            public void complete(String obj, FlowCompleteObserver observer) throws Exception {
+                observer.onComplete(obj);
+            }
+
+            @Override
+            public void error(String obj, FlowErrorObserver observer) throws Exception {
+                observer.onError(new Exception(),obj);
+            }
+
+        }).flow(WorkScheduler.MAIN,new FlowFunction<Integer, String>() {
+            @Override
+            public void next(Integer obj, FlowNextObserver<String> observer) throws Exception {
 
             }
-        }).flow(new FlowFunction<Integer, Integer>() {
-            @Override
-            public void next(Integer obj, Observer<Integer> observer) throws Exception {
 
-            }
-        }).subscribe(new Observer<Integer>() {
+        }).subscribe(new Observer<String>() {
             @Override
-            public void onNext(Integer obj) {
+            public void onNext(String obj) {
 
             }
 
@@ -65,9 +81,10 @@ public class Test {
             }
 
             @Override
-            public void onError(int code, String msg) {
+            public void onError(Throwable throwable, Object obj) {
 
             }
+
         });
     }
 }

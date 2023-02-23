@@ -68,7 +68,7 @@ public class WorkObservable<T> extends BaseObservable {
                         } catch (Exception e) {
                             e.printStackTrace();
                             if (observer != null) {
-                                observer.onError(0, e.getMessage());
+                                observer.onError(e, e.getMessage());
                             }
                         }
                     }
@@ -97,7 +97,7 @@ public class WorkObservable<T> extends BaseObservable {
                         } catch (Exception e) {
                             e.printStackTrace();
                             if (observer != null) {
-                                observer.onError(0, e.getMessage());
+                                observer.onError(e, e.getMessage());
                             }
                         }
                     }
@@ -144,7 +144,7 @@ public class WorkObservable<T> extends BaseObservable {
                         }
 
                         @Override
-                        public void onError(final int code, final String msg) {
+                        public void onError(final Throwable throwable, final Object msg) {
                             if (done) {
                                 return;
                             }
@@ -152,7 +152,7 @@ public class WorkObservable<T> extends BaseObservable {
                             postMain(new Runnable() {
                                 @Override
                                 public void run() {
-                                    observer.onError(code, msg);
+                                    observer.onError(throwable, msg);
                                 }
                             });
 
@@ -164,7 +164,7 @@ public class WorkObservable<T> extends BaseObservable {
                         postMain(new Runnable() {
                             @Override
                             public void run() {
-                                observer.onError(0, e.getMessage());
+                                observer.onError(e, e.getMessage());
                             }
                         });
                     }

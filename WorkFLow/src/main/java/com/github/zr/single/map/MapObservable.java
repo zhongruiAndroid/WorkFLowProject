@@ -36,7 +36,7 @@ public class MapObservable<T, R> extends BaseObservable {
                                 call = (R) function.call(obj);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                onError(0, e.getMessage());
+                                onError(e, e.getMessage());
                                 return;
                             }
                             if (subscriber != null) {
@@ -69,9 +69,8 @@ public class MapObservable<T, R> extends BaseObservable {
                     });
                 }
             }
-
             @Override
-            public void onError(final int code,final String msg) {
+            public void onError(final Throwable code,final Object msg) {
                 if (done) {
                     return;
                 }
