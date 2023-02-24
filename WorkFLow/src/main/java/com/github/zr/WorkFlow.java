@@ -7,6 +7,7 @@ import com.github.zr.multi.Flow;
 import com.github.zr.single.WorkObservable;
 import com.github.zr.single.Observable;
 import com.github.zr.single.WorkScheduler;
+import com.github.zr.single.flow.FlowObservable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,5 +41,11 @@ public class WorkFlow {
     }
     public static <T> WorkObservable<T> create(WorkScheduler scheduler,Observable<T> observable) {
         return new WorkObservable<T>(scheduler,observable);
+    }
+    public static <T> FlowObservable<T> createFlow(Observable<T> observable) {
+        return new FlowObservable<T>(observable);
+    }
+    public static <T> FlowObservable<T> createFlow(WorkScheduler scheduler,Observable<T> observable) {
+        return new FlowObservable<T>(scheduler,observable);
     }
 }

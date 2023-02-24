@@ -47,28 +47,6 @@ public class Test {
             public void subscribe(Observer<? super String> observer) throws Exception {
 
             }
-        }).flow(WorkScheduler.MAIN,new FlowFunction<String, Integer>() {
-            @Override
-            public void next(String obj, FlowNextObserver<Integer> observer) throws Exception {
-                observer.next(1);
-            }
-
-            @Override
-            public void complete(String obj, FlowCompleteObserver observer) throws Exception {
-                observer.onComplete(obj);
-            }
-
-            @Override
-            public void error(String obj, FlowErrorObserver observer) throws Exception {
-                observer.onError(new Exception(),obj);
-            }
-
-        }).flow(WorkScheduler.MAIN,new FlowFunction<Integer, String>() {
-            @Override
-            public void next(Integer obj, FlowNextObserver<String> observer) throws Exception {
-
-            }
-
         }).subscribe(new Observer<String>() {
             @Override
             public void onNext(String obj) {

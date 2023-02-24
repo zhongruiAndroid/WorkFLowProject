@@ -1,10 +1,7 @@
 package com.github.zr.single;
 
-import com.github.zr.R;
 import com.github.zr.single.filter.FilterObservable;
 import com.github.zr.single.filter.listener.FilterFunction;
-import com.github.zr.single.flow.FlowObservable;
-import com.github.zr.single.flow.listener.FlowFunction;
 import com.github.zr.single.map.MapObservable;
 import com.github.zr.single.map.listener.MapFunction;
 
@@ -19,8 +16,6 @@ public class WorkObservable<T> extends BaseObservable {
         this.setWorkScheduler(workScheduler);
         this.observable = observable;
     }
-
-
     public static <T> WorkObservable<T> create(Observable<T> observable) {
         return create(WorkScheduler.IO, observable);
     }
@@ -76,36 +71,6 @@ public class WorkObservable<T> extends BaseObservable {
             }
         });
     }
-
-    public <R> WorkObservable<R> flow(final FlowFunction<? super T,? extends R> function) {
-        return flow(WorkScheduler.IO, function);
-    }
-
-    public <R> WorkObservable<R> flow(WorkScheduler workScheduler, final FlowFunction<? super T,? extends R> function) {
-        final FlowObservable<T,R> flowObservable = new FlowObservable<T,R>(workScheduler, function);
-        return new WorkObservable(new Observable<T>() {
-            @Override
-            public void subscribe(final Observer<? super T> observer) throws Exception {
-                if (observable == null) {
-                    return;
-                }
-                execute(WorkObservable.this.getScheduler(), new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            observable.subscribe(flowObservable.call(observer));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            if (observer != null) {
-                                observer.onError(e, e.getMessage());
-                            }
-                        }
-                    }
-                });
-            }
-        });
-    }
-
     public void subscribe(final Observer<? super T> observer) {
         if (observable == null) {
             return;

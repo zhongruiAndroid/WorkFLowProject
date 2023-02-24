@@ -13,6 +13,9 @@ import com.github.zr.WorkFlow;
 import com.github.zr.multi.WorkListener;
 import com.github.zr.multi.WorkNotify;
 import com.github.zr.single.filter.listener.FilterFunction;
+import com.github.zr.single.flow.listener.FlowErrorObserver;
+import com.github.zr.single.flow.listener.FlowFunction;
+import com.github.zr.single.flow.listener.FlowNextObserver;
 import com.github.zr.single.map.listener.MapFunction;
 import com.test.workflowproject.test.Func;
 import com.test.workflowproject.test.MyObservable;
@@ -23,7 +26,6 @@ import org.json.JSONArray;
 
 import java.util.Map;
 
-import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -36,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         JSONArray jsonArray = new JSONArray();
         Log.i("=====", "=====" + jsonArray);
         String[] supportedAbis = new String[0];
@@ -207,46 +208,92 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void test() {
+        WorkFlow.createFlow(new com.github.zr.single.Observable<String>() {
+            @Override
+            public void subscribe(com.github.zr.single.Observer<? super String> subscriber) throws Exception {
+                subscriber.onNext("1");
+                subscriber.onNext("2");
+                subscriber.onNext("3");
+//                subscriber.onError(new Exception(), "onError2");
+//                subscriber.onError(new Exception(), "onError1");
+//                subscriber.onComplete("1");
+//                subscriber.onComplete("2");
+            }
+        }).flow(new FlowFunction<String, Integer>() {
+            @Override
+            public void next(String obj, FlowNextObserver<Integer> observer) throws Exception {
+                Log.i("=====","next1:"+obj );
+                observer.next(Integer.parseInt(obj+""+obj));
+            }
+        }).flow(new FlowFunction<Integer, String>() {
+            @Override
+            public void next(Integer obj, FlowNextObserver<String> observer) throws Exception {
+                Log.i("=====","next2:"+obj+"&&");
+                observer.next(obj+"&&");
+            }
+            @Override
+            public void error(Throwable throwable, Object obj, FlowErrorObserver observer) throws Exception {
+                Log.i("=====","error:"+obj.toString());
+                FlowFunction.super.error(throwable, obj, observer);
+            }
+        }).subscribe(new com.github.zr.single.Observer<String>() {
+            @Override
+            public void onNext(String obj) {
+                Log.i("=====", "==subscribe=onNext==" + obj);
+            }
+            @Override
+            public void onComplete(Object obj) {
+                Log.i("=====", "==subscribe=onComplete==" + obj);
+            }
+            @Override
+            public void onError(Throwable throwable, Object obj) {
+                Log.i("=====", "==subscribe=onError==" + obj.toString());
+            }
+        });
+    }
+
+    public void testd() {
         WorkFlow.create(new com.github.zr.single.Observable<String>() {
             @Override
             public void subscribe(com.github.zr.single.Observer<? super String> subscriber) throws Exception {
                 subscriber.onNext("1");
                 subscriber.onNext("2");
                 subscriber.onNext("3");
-                subscriber.onComplete("1");
                 subscriber.onError(new Exception(), "onError1");
+                subscriber.onComplete("1");
 //                subscriber.onCompleted();
                 subscriber.onError(new Exception(), "onError2");
                 subscriber.onComplete("2");
             }
-        }).map(new MapFunction<String, Integer>() {
+        }).map(new MapFunction<String, String>() {
             @Override
-            public Integer call(String obj) throws Exception {
-                if("2".equals(obj)){
-//                    return 1/0;
+            public String call(String obj) throws Exception {
+
+                return obj + "";
+            }
+        }).filter(new FilterFunction<String>() {
+            @Override
+            public boolean call(String obj) throws Exception {
+                if (obj.equals("33")) {
+                    return true;
                 }
-                return Integer.parseInt(obj);
+                return false;
             }
-        }).filter(new FilterFunction<Integer>() {
+        }).subscribe(new com.github.zr.single.Observer<String>() {
             @Override
-            public boolean call(Integer obj) throws Exception {
-                return obj==2;
+            public void onNext(String obj) {
+                Log.i("=====", "==subscribe=onNext==" + obj);
             }
-        }).subscribe(new com.github.zr.single.Observer<Integer>() {
-            @Override
-            public void onNext(Integer obj) {
-                Log.i("=====", "===onNext==" + obj);
-            }
+
             @Override
             public void onComplete(Object obj) {
-                Log.i("=====", "===onComplete==" + obj);
+                Log.i("=====", "==subscribe=onComplete==" + obj);
             }
 
             @Override
             public void onError(Throwable throwable, Object obj) {
-                Log.i("=====", "===onError==" + throwable);
+                Log.i("=====", "==subscribe=onError==" + obj.toString());
             }
-
         });
     }
 }
