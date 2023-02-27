@@ -40,12 +40,7 @@ public class MapObservable<T, R> extends BaseObservable {
                                 return;
                             }
                             if (subscriber != null) {
-                                postMain(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        subscriber.onNext(call);
-                                    }
-                                });
+                                subscriber.onNext(call);
                             }
                         }
                     });
@@ -61,7 +56,7 @@ public class MapObservable<T, R> extends BaseObservable {
                 }
                 done = true;
                 if (subscriber != null) {
-                    postMain(new Runnable() {
+                    execute(getScheduler(), new Runnable() {
                         @Override
                         public void run() {
                             subscriber.onComplete(obj);
@@ -76,7 +71,7 @@ public class MapObservable<T, R> extends BaseObservable {
                 }
                 done = true;
                 if (subscriber != null) {
-                    postMain(new Runnable() {
+                    execute(getScheduler(), new Runnable() {
                         @Override
                         public void run() {
                             subscriber.onError(code, msg);

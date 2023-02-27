@@ -2,6 +2,7 @@ package com.test.workflowproject;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.github.zr.multi.WorkCallback;
 import com.github.zr.WorkFlow;
 import com.github.zr.multi.WorkListener;
 import com.github.zr.multi.WorkNotify;
+import com.github.zr.single.WorkScheduler;
 import com.github.zr.single.filter.listener.FilterFunction;
 import com.github.zr.single.flow.listener.FlowErrorObserver;
 import com.github.zr.single.flow.listener.FlowFunction;
@@ -26,9 +28,11 @@ import org.json.JSONArray;
 
 import java.util.Map;
 
+import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -171,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void test1() {
+    public void test22() {
         rx.Observable.create(new rx.Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -181,15 +185,16 @@ public class MainActivity extends AppCompatActivity {
                 subscriber.onError(new Exception("test"));
                 subscriber.onCompleted();
             }
-        }).map(new Func1<String, Integer>() {
+        }).subscribeOn(null).observeOn(null).map(new Func1<String, Integer>() {
             @Override
             public Integer call(String s) {
-                if ("2".equals(s)) {
+                Log.i("=====","===s=="+s);
+                /*if ("2".equals(s)) {
                     return 1 / 0;
-                }
+                }*/
                 return Integer.parseInt(s);
             }
-        }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Integer>() {
+        }).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Integer>() {
             @Override
             public void onCompleted() {
                 Log.i("=====", "===onCompleted==");
@@ -207,34 +212,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void test() {
+    public void test3() {
         WorkFlow.createFlow(new com.github.zr.single.Observable<String>() {
             @Override
             public void subscribe(com.github.zr.single.Observer<? super String> subscriber) throws Exception {
                 subscriber.onNext("1");
                 subscriber.onNext("2");
                 subscriber.onNext("3");
-//                subscriber.onError(new Exception(), "onError2");
+                subscriber.onError(new Exception(), "onError2");
+                subscriber.onComplete("1");
 //                subscriber.onError(new Exception(), "onError1");
-//                subscriber.onComplete("1");
 //                subscriber.onComplete("2");
             }
         }).flow(new FlowFunction<String, Integer>() {
             @Override
             public void next(String obj, FlowNextObserver<Integer> observer) throws Exception {
-                Log.i("=====","next1:"+obj );
+//                Log.i("=====","next1:"+obj );
                 observer.next(Integer.parseInt(obj+""+obj));
             }
         }).flow(new FlowFunction<Integer, String>() {
             @Override
             public void next(Integer obj, FlowNextObserver<String> observer) throws Exception {
-                Log.i("=====","next2:"+obj+"&&");
+//                Log.i("=====","next2:"+obj+"&&");
                 observer.next(obj+"&&");
-            }
-            @Override
-            public void error(Throwable throwable, Object obj, FlowErrorObserver observer) throws Exception {
-                Log.i("=====","error:"+obj.toString());
-                FlowFunction.super.error(throwable, obj, observer);
             }
         }).subscribe(new com.github.zr.single.Observer<String>() {
             @Override
@@ -252,10 +252,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void testd() {
-        WorkFlow.create(new com.github.zr.single.Observable<String>() {
+    public void test() {
+        WorkFlow.create(/*WorkScheduler.MAIN,*/new com.github.zr.single.Observable<String>() {
             @Override
             public void subscribe(com.github.zr.single.Observer<? super String> subscriber) throws Exception {
+                Log.i("=====",(Looper.getMainLooper()==Looper.myLooper())+"==create===");
                 subscriber.onNext("1");
                 subscriber.onNext("2");
                 subscriber.onNext("3");
@@ -265,34 +266,33 @@ public class MainActivity extends AppCompatActivity {
                 subscriber.onError(new Exception(), "onError2");
                 subscriber.onComplete("2");
             }
-        }).map(new MapFunction<String, String>() {
+        }).map(/*WorkScheduler.MAIN,*/new MapFunction<String, String>() {
             @Override
             public String call(String obj) throws Exception {
 
+                Log.i("=====",(Looper.getMainLooper()==Looper.myLooper())+"====map=");
                 return obj + "";
             }
-        }).filter(new FilterFunction<String>() {
+        }).filter(/*WorkScheduler.MAIN,*/new FilterFunction<String>() {
             @Override
             public boolean call(String obj) throws Exception {
-                if (obj.equals("33")) {
-                    return true;
-                }
-                return false;
+                Log.i("=====",(Looper.getMainLooper()==Looper.myLooper())+"====filter=");
+                return true;
             }
         }).subscribe(new com.github.zr.single.Observer<String>() {
             @Override
             public void onNext(String obj) {
-                Log.i("=====", "==subscribe=onNext==" + obj);
+                Log.i("=====", (Looper.getMainLooper()==Looper.myLooper())+"==subscribe=onNext==" + obj);
             }
 
             @Override
             public void onComplete(Object obj) {
-                Log.i("=====", "==subscribe=onComplete==" + obj);
+                Log.i("=====", (Looper.getMainLooper()==Looper.myLooper())+"==subscribe=onComplete==" + obj);
             }
 
             @Override
             public void onError(Throwable throwable, Object obj) {
-                Log.i("=====", "==subscribe=onError==" + obj.toString());
+                Log.i("=====", (Looper.getMainLooper()==Looper.myLooper())+"==subscribe=onError==" + obj.toString());
             }
         });
     }

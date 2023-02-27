@@ -45,7 +45,7 @@ public class WorkFlow {
     public static <T> FlowObservable<T> createFlow(Observable<T> observable) {
         return new FlowObservable<T>(observable);
     }
-    public static <T> FlowObservable<T> createFlow(WorkScheduler scheduler,Observable<T> observable) {
+   /* public static <T> FlowObservable<T> createFlow(WorkScheduler scheduler,Observable<T> observable) {
         return new FlowObservable<T>(scheduler,observable);
-    }
+    }*/
 }

@@ -1,5 +1,5 @@
 package com.github.zr.single.flow.listener;
 
 public interface FlowCompleteObserver {
-    void onComplete(Object obj)throws Exception;
+    void onComplete(Object obj) ;
 }

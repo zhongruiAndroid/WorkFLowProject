@@ -38,7 +38,19 @@ public class WorkObservable<T> extends BaseObservable {
                 if (observable == null) {
                     return;
                 }
-                observable.subscribe(map.call(observer));
+                execute(WorkObservable.this.getScheduler(), new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            observable.subscribe(map.call(observer));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            if (observer != null) {
+                                observer.onError(e, e.getMessage());
+                            }
+                        }
+                    }
+                });
             }
         });
     }
@@ -96,13 +108,13 @@ public class WorkObservable<T> extends BaseObservable {
 
                         @Override
                         public void onComplete(final Object obj) {
-                            if (done) {
-                                return;
-                            }
-                            done = true;
                             postMain(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (done) {
+                                        return;
+                                    }
+                                    done = true;
                                     observer.onComplete(obj);
                                 }
                             });
@@ -110,13 +122,13 @@ public class WorkObservable<T> extends BaseObservable {
 
                         @Override
                         public void onError(final Throwable throwable, final Object msg) {
-                            if (done) {
-                                return;
-                            }
-                            done = true;
                             postMain(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (done) {
+                                        return;
+                                    }
+                                    done = true;
                                     observer.onError(throwable, msg);
                                 }
                             });

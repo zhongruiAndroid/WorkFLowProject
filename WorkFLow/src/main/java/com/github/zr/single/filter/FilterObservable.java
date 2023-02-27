@@ -22,7 +22,6 @@ public class FilterObservable<T> extends BaseObservable {
     public Observer call(final Observer<? super T> subscriber) {
         return new Observer<T>() {
             boolean done;
-
             @Override
             public void onNext(final T obj) {
                 if (done) {
@@ -35,32 +34,18 @@ public class FilterObservable<T> extends BaseObservable {
                             try {
                                 if (function.call(obj)) {
                                     if (subscriber != null) {
-                                        postMain(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                subscriber.onNext(obj);
-                                            }
-                                        });
+                                        subscriber.onNext(obj);
                                     }
                                 }
                             } catch (final Exception e) {
                                 e.printStackTrace();
-                                postMain(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        onError(e, e.getMessage());
-                                    }
-                                });
+                                onError(e, e.getMessage());
                                 return;
                             }
                         }
                     });
-
-
                 }
-
             }
-
             @Override
             public void onComplete(final Object obj) {
                 if (done) {
@@ -68,7 +53,7 @@ public class FilterObservable<T> extends BaseObservable {
                 }
                 done = true;
                 if (subscriber != null) {
-                    postMain(new Runnable() {
+                    execute(getScheduler(), new Runnable() {
                         @Override
                         public void run() {
                             subscriber.onComplete(obj);
@@ -83,14 +68,13 @@ public class FilterObservable<T> extends BaseObservable {
                 }
                 done = true;
                 if (subscriber != null) {
-                    postMain(new Runnable() {
+                    execute(getScheduler(), new Runnable() {
                         @Override
                         public void run() {
                             subscriber.onError(throwable, obj);
                         }
                     });
                 }
-
             }
         };
     }
