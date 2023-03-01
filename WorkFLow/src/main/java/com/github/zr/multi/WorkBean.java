@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Flow {
+public class WorkBean {
     private int count = 0;
     private AtomicInteger atomicInteger = new AtomicInteger();
     private AtomicInteger errorInteger = new AtomicInteger();
@@ -20,11 +20,11 @@ public class Flow {
 
     private AtomicBoolean rightAwayNotifyError;
 
-    public Flow() {
+    public WorkBean() {
         this(false);
     }
 
-    public Flow(boolean rightAwayNotifyError) {
+    public WorkBean(boolean rightAwayNotifyError) {
         this.rightAwayNotifyError = new AtomicBoolean(rightAwayNotifyError);
     }
     public void reset(){
@@ -34,7 +34,7 @@ public class Flow {
         workListenerList.clear();
         dataMap.clear();
     }
-    public Flow addWork(final WorkListener workListener) {
+    public WorkBean addWork(final WorkListener workListener) {
         if (workListener == null) {
             return this;
         }

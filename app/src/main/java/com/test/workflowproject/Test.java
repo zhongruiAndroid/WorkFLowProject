@@ -4,14 +4,6 @@ import com.github.zr.multi.WorkCallback;
 import com.github.zr.WorkFlow;
 import com.github.zr.multi.WorkListener;
 import com.github.zr.multi.WorkNotify;
-import com.github.zr.single.Observable;
-import com.github.zr.single.Observer;
-import com.github.zr.single.WorkScheduler;
-import com.github.zr.single.flow.listener.FlowCompleteObserver;
-import com.github.zr.single.flow.listener.FlowErrorObserver;
-import com.github.zr.single.flow.listener.FlowFunction;
-import com.github.zr.single.flow.listener.FlowNextObserver;
-import com.github.zr.single.listener.Fun1;
 
 import java.util.Map;
 
@@ -40,29 +32,6 @@ public class Test {
             public void onError() {
 
             }
-        });
-
-        WorkFlow.create(new Observable<String>() {
-            @Override
-            public void subscribe(Observer<? super String> observer) throws Exception {
-
-            }
-        }).subscribe(new Observer<String>() {
-            @Override
-            public void onNext(String obj) {
-
-            }
-
-            @Override
-            public void onComplete(Object obj) {
-
-            }
-
-            @Override
-            public void onError(Throwable throwable, Object obj) {
-
-            }
-
         });
     }
 }

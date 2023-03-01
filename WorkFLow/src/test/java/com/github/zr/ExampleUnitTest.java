@@ -4,6 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -13,5 +17,9 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
+    }
+    public static void test(){
+        Lock lock = new ReentrantLock();
+        lock.lock();
     }
 }
